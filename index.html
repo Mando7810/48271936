@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Свидание-рулетка · Алания</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1b2a; --bg2:#14273b; --card:#1b3149; --line:#2a4561;
+  --text:#f4ede4; --mute:#9fb3c8; --sun:#ff8a5b; --sun2:#ffc15e; --sea:#4fd1c5; --ok:#7bd88f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,system-ui,sans-serif;background:radial-gradient(120% 60% at 50% 0%,#24405e 0%,var(--bg) 60%);color:var(--text);min-height:100vh;padding:20px 16px 60px}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-family:Unbounded,sans-serif;font-size:26px;line-height:1.15;letter-spacing:-.5px}
+h1 span{background:linear-gradient(90deg,var(--sun),var(--sun2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mute);margin:6px 0 18px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.card h2{font-family:Unbounded,sans-serif;font-size:14px;letter-spacing:.3px;margin-bottom:10px;color:var(--sun2);text-transform:uppercase}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--bg2);color:var(--text);border:1px solid var(--line)}
+button:active{transform:scale(.97)}
+.big{width:100%;font-family:Unbounded,sans-serif;font-size:18px;padding:18px;background:linear-gradient(135deg,var(--sun),var(--sun2));color:#2a1405;border:0;box-shadow:0 8px 24px #ff8a5b40}
+.sea{background:var(--sea);color:#06231f;border:0}
+.ghost{background:transparent}
+select,input{font:inherit;background:var(--bg2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+.mute{color:var(--mute);font-size:13px}
+.status{font-size:14px;margin-bottom:10px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#666;margin-right:6px;vertical-align:middle}
+.dot.on{background:var(--ok);box-shadow:0 0 0 0 #7bd88f;animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px #7bd88f00}100%{box-shadow:0 0 0 0 #7bd88f00}}
+.result{display:none;margin-top:14px;padding:16px;border-radius:16px;background:linear-gradient(160deg,#21405f,#1a2f45);border:1px solid #3b6286}
+.result.show{display:block;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.place{font-family:Unbounded,sans-serif;font-size:21px;margin-bottom:4px}
+.meta{color:var(--sea);font-weight:700;font-size:14px;margin-bottom:8px}
+.task{background:#0d1b2a99;border-left:3px solid var(--sun);padding:10px 12px;border-radius:8px;margin:10px 0;font-size:15px}
+.spinning .place{filter:blur(.5px);opacity:.8}
+a.btn{display:inline-block;text-decoration:none;color:#06231f;background:var(--sea);padding:12px 14px;border-radius:12px;font-weight:700}
+.deck{min-height:120px;display:flex;flex-direction:column;justify-content:center;text-align:center;border-radius:16px;padding:18px;background:var(--bg2);border:1px dashed var(--line);margin-bottom:10px}
+.deck .cat{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--sun2);margin-bottom:8px;font-weight:700}
+.deck .txt{font-size:17px;font-weight:600;line-height:1.35}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.pl{background:var(--bg2);border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
+.pl input{text-align:center;padding:4px;border:0;background:transparent;font-weight:700}
+.pl .pts{font-family:Unbounded,sans-serif;font-size:26px;color:var(--sun2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:7px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--bg2);border:1px solid var(--line)}
+.chip.on{background:var(--sun);color:#2a1405;border-color:var(--sun)}
+.timer{font-family:Unbounded,sans-serif;font-size:30px;letter-spacing:1px}
+.hist{list-style:none;font-size:14px}
+.hist li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.hist li span:last-child{color:var(--mute);white-space:nowrap}
+.coin{font-size:44px;text-align:center;margin:6px 0}
+.modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:20px;z-index:9}
+.modal.show{display:flex}
+.modal .card{max-width:420px;width:100%}
+input[type=range]{padding:0;accent-color:var(--sun)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Свидание-<span>рулетка</span><br>Алания</h1>
+  <p class="sub">Жмёте кнопку — судьба решает, куда идти и что делать. 3–4 часа, без планов.</p>
+
+  <div class="card">
+    <h2>⏱ Свидание</h2>
+    <div class="row" style="justify-content:space-between">
+      <div class="timer" id="timer">0:00:00</div>
+      <button id="timerBtn">Старт</button>
+    </div>
+    <div class="score">
+      <div class="pl"><input id="n1" value="Андрей"><div class="pts" id="p1">0</div></div>
+      <div class="pl"><input id="n2" value="Она"><div class="pts" id="p2">0</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📍 Где мы</h2>
+    <div class="status" id="geoStatus"><span class="dot" id="dot"></span>Локация не определена</div>
+    <button class="sea" id="geoBtn" style="width:100%;margin-bottom:10px">Отслеживать нашу локацию</button>
+    <div class="mute" style="margin-bottom:6px">…или выберите, где вы сейчас:</div>
+    <select id="startSel"></select>
+    <div style="margin-top:12px" class="mute">Радиус прогулки: <b id="radV">1.2</b> км</div>
+    <input type="range" id="rad" min="0.4" max="3" step="0.1" value="1.2">
+  </div>
+
+  <div class="card">
+    <h2>🎲 Куда идём</h2>
+    <button class="big" id="spin">Крутить рулетку</button>
+    <div class="result" id="res">
+      <div class="place" id="rName">—</div>
+      <div class="meta" id="rMeta"></div>
+      <div class="mute" id="rDesc"></div>
+      <div class="task" id="rTask"></div>
+      <div class="row">
+        <a class="btn" id="rMap" href="#" target="_blank" rel="noopener">🧭 Маршрут</a>
+        <button id="arrived">✓ Мы на месте (+3)</button>
+        <button class="ghost" id="reroll">↻ Другое</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🪙 Режим «монетка»</h2>
+    <p class="mute" style="margin-bottom:10px">Без цели: идёте туда, куда скажет монетка, и заходите в первое интересное место.</p>
+    <div class="coin" id="coin">🪙</div>
+    <div style="text-align:center;font-weight:700;font-size:17px;min-height:24px;margin-bottom:10px" id="coinTxt"></div>
+    <button style="width:100%" id="coinBtn">Бросить</button>
+  </div>
+
+  <div class="card">
+    <h2>🃏 Задания</h2>
+    <div class="chips" id="chips"></div>
+    <div class="deck"><div class="cat" id="dCat">колода</div><div class="txt" id="dTxt">Тяните карту — выполнил задание, получи очки.</div></div>
+    <div class="row">
+      <button style="flex:1" class="sea" id="draw">Тянуть карту</button>
+      <button id="d1">✓ <span class="nm1">Андрей</span></button>
+      <button id="d2">✓ <span class="nm2">Она</span></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📜 Где мы уже были</h2>
+    <ul class="hist" id="hist"><li class="mute">Пока нигде. Крутите рулетку!</li></ul>
+    <button class="ghost" id="reset" style="margin-top:10px;width:100%">Начать новое свидание</button>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="card"><h2 id="mT">Точно?</h2><p class="mute" id="mP" style="margin-bottom:14px">Счёт, таймер и история обнулятся.</p><div class="row"><button class="sea" id="mYes">Да</button><button id="mNo">Отмена</button></div></div></div>
+
+<script>
+const PLACES=[
+ {n:"Красная башня",q:"Kızıl Kule, Alanya",lat:36.5393,lng:31.9995,d:"Символ города. Поднимитесь наверх и найдите свой дом.",t:"Найдите сверху точку, где вы когда-то были вместе, и расскажите, что тогда чувствовали."},
+ {n:"Верфь Терсане",q:"Tersane, Alanya",lat:36.5367,lng:31.9978,d:"Сельджукская верфь у самой воды, тропа от башни.",t:"Придумайте имя кораблю, который построили бы вместе, и куда бы на нём уплыли."},
+ {n:"Улочки Тофане",q:"Tophane, Alanya",lat:36.5381,lng:31.9958,d:"Старый город, лестницы и дома с деревянными эркерами.",t:"Выберите дом, в котором жили бы в старости. Опишите один день из той жизни."},
+ {n:"Эхмедек",q:"Ehmedek, Alanya",lat:36.5359,lng:31.9928,d:"Средняя часть крепости, вид на обе бухты.",t:"Сделайте фото, где вас не видно, но понятно, что вы вместе."},
+ {n:"Внутренняя крепость",q:"İç Kale, Alanya",lat:36.5343,lng:31.9881,d:"Самая высокая точка, закатный вид.",t:"Каждый загадывает желание на следующий год — вслух скажите только первое слово."},
+ {n:"Канатная дорога",q:"Alanya Teleferik",lat:36.5437,lng:31.9886,d:"Нижняя станция у Дамлаташ. Проверьте часы работы.",t:"Пока едете — ни слова. Только взгляды и жесты."},
+ {n:"Пещера Дамлаташ",q:"Damlataş Mağarası, Alanya",lat:36.5434,lng:31.9876,d:"Пещера со сталактитами прямо в городе.",t:"Расскажите друг другу один страх, о котором другой не знает."},
+ {n:"Пляж Клеопатры",q:"Kleopatra Plajı, Alanya",lat:36.5476,lng:31.9836,d:"Вечером тихо и почти пусто.",t:"Напишите на песке одно слово про другого. Угадайте, что написал второй."},
+ {n:"Музей Алании",q:"Alanya Müzesi",lat:36.5457,lng:31.9890,d:"Маленький музей с садом. Сад — самое атмосферное.",t:"Придумайте легенду: что за артефакт останется от вас через 2000 лет?"},
+ {n:"Дом Ататюрка",q:"Atatürk Evi ve Müzesi, Alanya",lat:36.5450,lng:31.9916,d:"Старый особняк в переулках.",t:"Сфотографируйте друг друга в «музейной» позе, как портрет XIX века."},
+ {n:"Гавань и пирс",q:"Alanya Liman",lat:36.5405,lng:31.9988,d:"Лодки, огни, рыбаки.",t:"Выберите лодку и придумайте историю её капитана. У кого смешнее — +2."},
+ {n:"Маяк на волнорезе",q:"Alanya Deniz Feneri",lat:36.5380,lng:32.0012,d:"Конец волнореза, море с трёх сторон.",t:"Медленный танец без музыки. Минимум одна минута."},
+ {n:"Мечеть Куюларёню",q:"Kuyularönü Camii, Alanya",lat:36.5386,lng:31.9946,d:"Старая мечеть у подножия крепости.",t:"Тихо посидите рядом 3 минуты, просто слушая город."},
+ {n:"Пляж Кейкубат",q:"Keykubat Plajı, Alanya",lat:36.5462,lng:32.0042,d:"Длинный пляж к востоку от центра.",t:"Соберите по 3 камня, похожих друг на друга. Подарите другому самый красивый."},
+ {n:"Площадь Ататюрка",q:"Atatürk Anıtı, Alanya",lat:36.5443,lng:31.9998,d:"Центр города, суета и огни.",t:"Попросите незнакомца сфотографировать вас — и сказать, сколько вы, по его мнению, вместе."},
+ {n:"Пешеходная Мустафа Кемаль",q:"İskele Caddesi, Alanya",lat:36.5420,lng:31.9990,d:"Набережная с кафе и баром.",t:"Закажите друг другу напиток, который другой никогда не пробовал."},
+ {n:"Сюлеймание и Бедестен",q:"Süleymaniye Camii, Alanya Kalesi",lat:36.5350,lng:31.9900,d:"Внутри стен крепости, старый караван-сарай.",t:"Сыграйте в торговцев: «продайте» другому что-то из своих карманов. Торг обязателен."},
+ {n:"Городской парк у Дамлаташ",q:"Damlataş Parkı, Alanya",lat:36.5440,lng:31.9895,d:"Тенистый уголок между пляжем и улицей.",t:"По очереди перечисляйте, за что любите — кто первый замолчит на 5 секунд, тот проиграл."}
+];
+
+const DECK={
+ "📸 Фото":[
+  "Фото, где вы оба отражаетесь в чём-то (витрина, лужа, очки).",
+  "Портрет с самым незнакомым котом поблизости.",
+  "Сделайте фото как на вашем самом первом совместном снимке.",
+  "Снимите 5-секундное видео-признание. Без репетиции.",
+  "Найдите вывеску с ошибкой или смешным переводом.",
+  "Фото «пара туристов, впервые в Алании» — максимально нелепо."
+ ],
+ "💬 Вопрос":[
+  "Какой момент за все годы ты бы прожил(а) ещё раз?",
+  "Что во мне тебя раздражало вначале, а теперь нравится?",
+  "Какую мелочь я делаю, от которой тебе хорошо?",
+  "Где ты видишь нас через 10 лет? Конкретно: город, дом, утро.",
+  "Чего ты никогда не пробовал(а), но хочешь попробовать вместе?",
+  "Какая песня — про нас?"
+ ],
+ "🔥 Смелое":[
+  "Спросите у прохожего, где лучший дёнер в центре — и идите туда.",
+  "Научитесь у продавца одной турецкой фразе, которую не знали.",
+  "Спойте припев любой песни прямо здесь. Вдвоём.",
+  "Попросите незнакомцев загадать вам маленькое задание.",
+  "Пройдите 100 метров, держась за руки и шагая в ногу, как солдаты."
+ ],
+ "❤️ Романтика":[
+  "Шепните на ухо три вещи, которые сегодня в другом заметили.",
+  "Поцелуй на счёт — но выбирает другой, где именно.",
+  "Купите друг другу подарок до 50 лир за 5 минут. Без подглядываний.",
+  "Опишите наш первый день так, будто рассказываете внукам.",
+  "Обнимитесь и не отпускайте, пока не досчитаете молча до 30."
+ ],
+ "🍯 Вкусное":[
+  "Попробуйте сладость, название которой не можете прочитать.",
+  "Купите один напиток на двоих и пейте по очереди через одну трубочку.",
+  "Закажите что-то наугад, ткнув в меню с закрытыми глазами.",
+  "Найдите лучший чай в радиусе 200 метров и оцените по 10-балльной."
+ ],
+ "🎯 Игра":[
+  "Камень-ножницы-бумага до 3 побед: проигравший платит за следующую остановку.",
+  "«Угадай мелодию»: напевайте без слов, другой угадывает. 3 раунда.",
+  "Кто первый найдёт что-то синее, круглое и съедобное — +2.",
+  "20 вопросов «да/нет»: загадайте общее воспоминание."
+ ]
+};
+
+const $=id=>document.getElementById(id);
+let S={p1:0,p2:0,hist:[],start:null,used:[],cats:Object.keys(DECK)};
+try{const s=JSON.parse(localStorage.getItem("dateRoulette"));if(s)S=Object.assign(S,s)}catch(e){}
+const save=()=>{try{localStorage.setItem("dateRoulette",JSON.stringify(S))}catch(e){}};
+
+let here=null, current=null, watchId=null;
+
+// start select
+const sel=$("startSel");
+sel.innerHTML='<option value="">— выбрать место —</option>'+PLACES.map((p,i)=>`<option value="${i}">${p.n}</option>`).join("");
+sel.onchange=()=>{if(sel.value!==""){const p=PLACES[sel.value];here={lat:p.lat,lng:p.lng,manual:true};setStatus(false,"Мы у: "+p.n)}};
+
+function setStatus(on,txt){$("dot").className="dot"+(on?" on":"");$("geoStatus").lastChild.textContent=txt}
+
+$("geoBtn").onclick=()=>{
+  if(!navigator.geolocation){setStatus(false,"Геолокация недоступна — выберите место ниже");return}
+  setStatus(false,"Ищу вас…");
+  try{
+    if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+    watchId=navigator.geolocation.watchPosition(pos=>{
+      here={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      const near=nearest();
+      setStatus(true,"Отслеживаю · рядом: "+near.p.n+" ("+fmt(near.d)+")");
+      if(current)renderMeta();
+    },()=>setStatus(false,"Здесь браузер не дал доступ к локации — выберите место ниже"),{enableHighAccuracy:true,maximumAge:15000,timeout:15000});
+  }catch(e){setStatus(false,"Геолокация недоступна — выберите место ниже")}
+};
+
+function dist(a,b){const R=6371000,r=x=>x*Math.PI/180;const dLa=r(b.lat-a.lat),dLo=r(b.lng-a.lng);const h=Math.sin(dLa/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function fmt(m){return m<1000?Math.round(m/10)*10+" м":(m/1000).toFixed(1)+" км"}
+function nearest(){let best=null;PLACES.forEach(p=>{const d=dist(here,p);if(!best||d<best.d)best={p,d}});return best}
+
+$("rad").oninput=e=>$("radV").textContent=(+e.target.value).toFixed(1);
+
+function pickPlace(){
+  const R=+$("rad").value*1000;
+  let pool=PLACES.filter(p=>!S.used.includes(p.n));
+  if(here){
+    const inR=pool.filter(p=>{const d=dist(here,p);return d>60&&d<=R});
+    if(inR.length)pool=inR;
+    else pool=pool.sort((a,b)=>dist(here,a)-dist(here,b)).slice(0,4);
+  }
+  if(!pool.length){S.used=[];pool=PLACES}
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function renderMeta(){
+  if(!current)return;
+  if(here){const d=dist(here,current)*1.3;$("rMeta").textContent="≈ "+fmt(d)+" · "+Math.max(2,Math.round(d/75))+" мин пешком"}
+  else $("rMeta").textContent="Включите локацию или выберите, где вы, — покажу расстояние";
+}
+
+function spin(){
+  const res=$("res");res.classList.add("show","spinning");
+  $("rDesc").textContent="";$("rTask").textContent="";$("rMeta").textContent="";
+  let i=0;const final=pickPlace();
+  const iv=setInterval(()=>{$("rName").textContent=PLACES[Math.floor(Math.random()*PLACES.length)].n;
+    if(++i>14){clearInterval(iv);res.classList.remove("spinning");current=final;
+      $("rName").textContent=final.n;$("rDesc").textContent=final.d;$("rTask").textContent="Задание на месте: "+final.t;
+      $("rMap").href="https://www.google.com/maps/dir/?api=1&travelmode=walking&destination="+encodeURIComponent(final.q);
+      renderMeta();}
+  },70+i*4);
+}
+$("spin").onclick=spin;$("reroll").onclick=spin;
+
+$("arrived").onclick=()=>{
+  if(!current)return;
+  if(!S.used.includes(current.n))S.used.push(current.n);
+  S.p1+=3;S.p2+=3;S.hist.unshift({n:current.n,t:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})});
+  here={lat:current.lat,lng:current.lng,manual:watchId===null};
+  if(watchId===null){sel.value=PLACES.indexOf(current);setStatus(false,"Мы у: "+current.n)}
+  current=null;$("res").classList.remove("show");save();render();
+};
+
+// coin
+$("coinBtn").onclick=()=>{
+  const c=$("coin");c.style.transition="transform .6s";c.style.transform="rotateY(1080deg)";
+  setTimeout(()=>{c.style.transition="none";c.style.transform="none";
+    const dir=["⬅️ Налево","➡️ Направо","⬆️ Прямо","⬆️ Прямо","↩️ Вниз, к морю","↪️ Вверх, к крепости"][Math.floor(Math.random()*6)];
+    const min=[3,5,5,7,10][Math.floor(Math.random()*5)];
+    const then=["зайдите в первую лавку","возьмите что-то сладкое","сядьте на первую скамейку и тяните карту","спросите у кого-нибудь совет, куда дальше","сфотографируйтесь","поцелуйтесь"][Math.floor(Math.random()*6)];
+    $("coinTxt").textContent=dir+" · "+min+" мин, потом "+then;
+  },600);
+};
+
+// deck
+function renderChips(){
+  $("chips").innerHTML=Object.keys(DECK).map(k=>`<span class="chip ${S.cats.includes(k)?"on":""}" data-k="${k}">${k}</span>`).join("");
+  document.querySelectorAll(".chip").forEach(ch=>ch.onclick=()=>{const k=ch.dataset.k;
+    S.cats=S.cats.includes(k)?S.cats.filter(x=>x!==k):[...S.cats,k];if(!S.cats.length)S.cats=[k];save();renderChips()});
+}
+let card=null;
+$("draw").onclick=()=>{
+  const cat=S.cats[Math.floor(Math.random()*S.cats.length)];const arr=DECK[cat];
+  card={cat,txt:arr[Math.floor(Math.random()*arr.length)],pts:cat.includes("Смелое")?3:2};
+  $("dCat").textContent=cat+" · +"+card.pts;$("dTxt").textContent=card.txt;
+};
+function done(who){if(!card)return;S[who]+=card.pts;card=null;$("dCat").textContent="✓ засчитано";$("dTxt").textContent="Тяните следующую.";save();render()}
+$("d1").onclick=()=>done("p1");$("d2").onclick=()=>done("p2");
+
+// names
+["n1","n2"].forEach((id,i)=>{try{const v=localStorage.getItem("dr_"+id);if(v)$(id).value=v}catch(e){}
+  $(id).oninput=()=>{try{localStorage.setItem("dr_"+id,$(id).value)}catch(e){};render()}});
+
+// timer
+$("timerBtn").onclick=()=>{S.start=S.start?null:Date.now();save();render()};
+setInterval(()=>{if(!S.start){$("timer").textContent="0:00:00";return}
+  const s=Math.floor((Date.now()-S.start)/1000);$("timer").textContent=Math.floor(s/3600)+":"+String(Math.floor(s/60)%60).padStart(2,"0")+":"+String(s%60).padStart(2,"0")},1000);
+
+// reset
+$("reset").onclick=()=>$("modal").classList.add("show");
+$("mNo").onclick=()=>$("modal").classList.remove("show");
+$("mYes").onclick=()=>{S={p1:0,p2:0,hist:[],start:null,used:[],cats:Object.keys(DECK)};save();render();renderChips();$("modal").classList.remove("show")};
+
+function render(){
+  $("p1").textContent=S.p1;$("p2").textContent=S.p2;
+  document.querySelectorAll(".nm1").forEach(e=>e.textContent=$("n1").value||"Он");
+  document.querySelectorAll(".nm2").forEach(e=>e.textContent=$("n2").value||"Она");
+  $("timerBtn").textContent=S.start?"Стоп":"Старт";
+  $("hist").innerHTML=S.hist.length?S.hist.map(h=>`<li><span>${h.n}</span><span>${h.t}</span></li>`).join(""):'<li class="mute">Пока нигде. Крутите рулетку!</li>';
+}
+renderChips();render();
+</script>
+</body>
+</html>

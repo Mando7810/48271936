@@ -72,7 +72,7 @@ input[type=range]{padding:0;accent-color:var(--sun)}
     </div>
     <div class="score">
       <div class="pl"><input id="n1" value="Андрей"><div class="pts" id="p1">0</div></div>
-      <div class="pl"><input id="n2" value="Она"><div class="pts" id="p2">0</div></div>
+      <div class="pl"><input id="n2" value="Соня"><div class="pts" id="p2">0</div></div>
     </div>
   </div>
 
@@ -117,7 +117,7 @@ input[type=range]{padding:0;accent-color:var(--sun)}
     <div class="row">
       <button style="flex:1" class="sea" id="draw">Тянуть карту</button>
       <button id="d1">✓ <span class="nm1">Андрей</span></button>
-      <button id="d2">✓ <span class="nm2">Она</span></button>
+      <button id="d2">✓ <span class="nm2">Соня</span></button>
     </div>
   </div>
 
@@ -314,7 +314,7 @@ $("mYes").onclick=()=>{S={p1:0,p2:0,hist:[],start:null,used:[],cats:Object.keys(
 function render(){
   $("p1").textContent=S.p1;$("p2").textContent=S.p2;
   document.querySelectorAll(".nm1").forEach(e=>e.textContent=$("n1").value||"Он");
-  document.querySelectorAll(".nm2").forEach(e=>e.textContent=$("n2").value||"Она");
+  document.querySelectorAll(".nm2").forEach(e=>e.textContent=$("n2").value||"Соня");
   $("timerBtn").textContent=S.start?"Стоп":"Старт";
   $("hist").innerHTML=S.hist.length?S.hist.map(h=>`<li><span>${h.n}</span><span>${h.t}</span></li>`).join(""):'<li class="mute">Пока нигде. Крутите рулетку!</li>';
 }

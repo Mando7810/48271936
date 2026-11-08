@@ -43,7 +43,7 @@ a.btn{display:inline-block;text-decoration:none;color:#06231f;background:var(--s
 .deck .txt{font-size:17px;font-weight:600;line-height:1.35}
 .score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .pl{background:var(--bg2);border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
-.pl input{text-align:center;padding:4px;border:0;background:transparent;font-weight:700}
+.pl .nm{font-weight:700;padding:4px}
 .pl .pts{font-family:Unbounded,sans-serif;font-size:26px;color:var(--sun2)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .chip{padding:7px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--bg2);border:1px solid var(--line)}
@@ -71,8 +71,8 @@ input[type=range]{padding:0;accent-color:var(--sun)}
       <button id="timerBtn">Старт</button>
     </div>
     <div class="score">
-      <div class="pl"><input id="n1" value="Андрей"><div class="pts" id="p1">0</div></div>
-      <div class="pl"><input id="n2" value="Соня"><div class="pts" id="p2">0</div></div>
+      <div class="pl"><div class="nm">Андрей</div><div class="pts" id="p1">0</div></div>
+      <div class="pl"><div class="nm">Соня</div><div class="pts" id="p2">0</div></div>
     </div>
   </div>
 
@@ -282,9 +282,6 @@ $("draw").onclick=()=>{
 function done(who){if(!card)return;S[who]+=card.pts;card=null;$("dCat").textContent="✓ засчитано";$("dTxt").textContent="Тяните следующую.";save();render()}
 $("d1").onclick=()=>done("p1");$("d2").onclick=()=>done("p2");
 
-// names
-["n1","n2"].forEach((id,i)=>{try{const v=localStorage.getItem("dr_"+id);if(v)$(id).value=v}catch(e){}
-  $(id).oninput=()=>{try{localStorage.setItem("dr_"+id,$(id).value)}catch(e){};render()}});
 
 // timer
 $("timerBtn").onclick=()=>{S.start=S.start?null:Date.now();save();render()};
@@ -298,8 +295,8 @@ $("mYes").onclick=()=>{S={p1:0,p2:0,hist:[],start:null,used:[],cats:Object.keys(
 
 function render(){
   $("p1").textContent=S.p1;$("p2").textContent=S.p2;
-  document.querySelectorAll(".nm1").forEach(e=>e.textContent=$("n1").value||"Он");
-  document.querySelectorAll(".nm2").forEach(e=>e.textContent=$("n2").value||"Соня");
+  document.querySelectorAll(".nm1").forEach(e=>e.textContent="Андрей");
+  document.querySelectorAll(".nm2").forEach(e=>e.textContent="Соня");
   $("timerBtn").textContent=S.start?"Стоп":"Старт";
   $("hist").innerHTML=S.hist.length?S.hist.map(h=>`<li><span>${h.n}</span><span>${h.t}</span></li>`).join(""):'<li class="mute">Пока нигде. Крутите рулетку!</li>';
 }
